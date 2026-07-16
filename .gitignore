@@ -2,3 +2,14 @@ venv/
 __pycache__/
 .env
 .DS_Store
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+
+*.key
+secrets.json
+credentials.json
+config/secrets.yml
