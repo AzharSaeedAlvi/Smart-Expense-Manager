@@ -21,7 +21,7 @@ class ExpenseRead(BaseModel):
 
 
 class ExpenseUpdate(BaseModel):
-        amount: Decimal | None = Field(default=None, gt=0)          #NONE makes it optional
+        amount: Decimal | None = Field(default=None, gt=0, max_digits=10)          #NONE makes it optional
         description: str | None = Field(default=None, min_length=1, max_length=255)
         spent_on: date | None = None
 

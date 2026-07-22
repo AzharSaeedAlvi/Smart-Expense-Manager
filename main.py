@@ -43,7 +43,6 @@ def update_expense(expense_id: int, payload: ExpenseUpdate, db: Session = Depend
     expense = db.get(Expense, expense_id)
     if expense is None: 
         raise HTTPException(status_code=404, detail="Expense not found")
-    return expense
 
     update_data= payload.model_dump(exclude_unset=True)    #Give me a dict of only the fields that the client sent.
     for field, value in update_data.items():
@@ -53,3 +52,13 @@ def update_expense(expense_id: int, payload: ExpenseUpdate, db: Session = Depend
     db.commit()
     db.refresh(expense)
     return expense
+
+@app.delete("/expense/{expense.id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_expense(expense_id: int, db: Session = Depends(get_db)):
+    expense = db.get(Expense, expense_id)
+    if expense is None:
+        raise HTTPException(status_code=404, detail="Expense not found")
+
+    db.delete(expense)
+    db.commit()
+    return None
