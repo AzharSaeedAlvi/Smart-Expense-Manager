@@ -1,9 +1,13 @@
-from fastapi import FastAPI, Depends, status
+from fastapi import FastAPI, Depends, status, HTTPException
 from sqlalchemy.orm import Session
+
 
 from database import get_db
 from models import Expense
 from schemas import ExpenseCreate, ExpenseRead
+
+from typing import List 
+from sqlalchemy import select
 
 app = FastAPI()
 
@@ -21,3 +25,14 @@ def create_expense(payload: ExpenseCreate, db: Session = Depends(get_db)):
     db.refresh(expense)      # Re-reads it so the DB generated files gets populated in your object. 
     return expense           # Converts : raw SQLAlchemy object, response_model and from_attributes=True into clean JSON.
 
+
+@app.get("/expenses", response_model=List[ExpenseRead])
+def list_expenses(db: Session = Depends(get_db)):
+    return db.scalars(select(Expense)).all()
+
+@app.get("/expenses/{expense_id}", response_model=ExpenseRead)
+def get_expense(expense_id: int, db: Session = Depends(get_db)):
+    expense = db.get(Expense, expense_id)
+    if expense is None:
+        raise HTTPException(status_code=404, detail="Expense Not Found")
+    return expense

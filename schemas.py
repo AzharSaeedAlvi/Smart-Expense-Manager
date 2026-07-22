@@ -16,7 +16,7 @@ class ExpenseRead(BaseModel):
     description: str
     created_at: datetime
     updated_at: datetime
-    spent_on: date
+    spent_on: date        #added this for a fix. 
     model_config = ConfigDict(from_attributes=True)  # tells Pydantic to read data from ORM objects
 
     
