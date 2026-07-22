@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from decimal import Decimal
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -6,6 +6,7 @@ class ExpenseCreate(BaseModel):
     """Data the CLIENT is allowed to send when creating an expense."""
     amount: Decimal = Field(gt=0)
     description: str = Field(min_length=1, max_length=255)
+    spent_on: date
     # add your other client-supplied columns here to match models.py
 
 class ExpenseRead(BaseModel):
@@ -15,7 +16,7 @@ class ExpenseRead(BaseModel):
     description: str
     created_at: datetime
     updated_at: datetime
-
+    spent_on: date
     model_config = ConfigDict(from_attributes=True)  # tells Pydantic to read data from ORM objects
 
     
