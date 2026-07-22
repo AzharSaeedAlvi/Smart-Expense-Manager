@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 from models import Expense
-from schemas import ExpenseCreate, ExpenseRead
+from schemas import ExpenseCreate, ExpenseRead, ExpenseUpdate
 
 from typing import List 
 from sqlalchemy import select
@@ -35,4 +35,21 @@ def get_expense(expense_id: int, db: Session = Depends(get_db)):
     expense = db.get(Expense, expense_id)
     if expense is None:
         raise HTTPException(status_code=404, detail="Expense Not Found")
+    return expense
+
+
+@app.patch("/expenses/{expense_id}", response_model=ExpenseRead)
+def update_expense(expense_id: int, payload: ExpenseUpdate, db: Session = Depends(get_db)):
+    expense = db.get(Expense, expense_id)
+    if expense is None: 
+        raise HTTPException(status_code=404, detail="Expense not found")
+    return expense
+
+    update_data= payload.model_dump(exclude_unset=True)    #Give me a dict of only the fields that the client sent.
+    for field, value in update_data.items():
+        setattr(expense, field, value)
+
+
+    db.commit()
+    db.refresh(expense)
     return expense

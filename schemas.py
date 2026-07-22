@@ -19,4 +19,10 @@ class ExpenseRead(BaseModel):
     spent_on: date        #added this for a fix. 
     model_config = ConfigDict(from_attributes=True)  # tells Pydantic to read data from ORM objects
 
+
+class ExpenseUpdate(BaseModel):
+        amount: Decimal | None = Field(default=None, gt=0)          #NONE makes it optional
+        description: str | None = Field(default=None, min_length=1, max_length=255)
+        spent_on: date | None = None
+
     
