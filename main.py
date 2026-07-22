@@ -37,6 +37,7 @@ def get_expense(expense_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Expense Not Found")
     return expense
 
+#We deliberately use PATCH instead of PUT because we want to allow partial updates. If we use PUT, then it will automatically remove every field that the client did not send. PATCH allows us to only update the fields that the client sent.
 
 @app.patch("/expenses/{expense_id}", response_model=ExpenseRead)
 def update_expense(expense_id: int, payload: ExpenseUpdate, db: Session = Depends(get_db)):
@@ -53,7 +54,7 @@ def update_expense(expense_id: int, payload: ExpenseUpdate, db: Session = Depend
     db.refresh(expense)
     return expense
 
-@app.delete("/expense/{expense.id}", status_code=status.HTTP_204_NO_CONTENT)
+@app.delete("/expenses/{expense_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_expense(expense_id: int, db: Session = Depends(get_db)):
     expense = db.get(Expense, expense_id)
     if expense is None:
