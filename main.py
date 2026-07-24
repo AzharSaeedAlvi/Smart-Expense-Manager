@@ -9,6 +9,12 @@ from schemas import ExpenseCreate, ExpenseRead, ExpenseUpdate
 from typing import List 
 from sqlalchemy import select
 
+#Phase 3 imports
+
+from models import User
+from schemas import UserCreate, UserRead
+from security import hash_password
+
 app = FastAPI()
 
 DEV_USER_ID = 5  #TEMP: Phase 3 replaces this with the authenticated user
@@ -63,3 +69,24 @@ def delete_expense(expense_id: int, db: Session = Depends(get_db)):
     db.delete(expense)
     db.commit()
     return None
+
+
+
+#Adding the Phase 3 section 
+
+@app.post("/auth/reg", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+def register(payload: UserCreate, db: Session = Depends(get_db)):
+    existing = db.scalars(select(User).where(User.email == payload.email)).first()
+    if existing is not None:
+        raise HTTPException(status_code=409, detail="Email already registered")
+
+
+    user = User(
+        name=payload.name,
+        email=payload.email,
+        hashed_password=hash_password(payload.password),
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
