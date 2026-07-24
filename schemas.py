@@ -25,4 +25,26 @@ class ExpenseUpdate(BaseModel):
         description: str | None = Field(default=None, min_length=1, max_length=255)
         spent_on: date | None = None
 
-    
+
+#Phase 3
+
+class UserCreate(BaseModel):
+     """"What a client sends to register"""
+
+     name: str = Field(min_length=1, max_length=100)
+     email: str
+     password: str = Field(min_length=8)
+
+
+class UserRead(BaseModel):
+     """What server sends back - no password, no hash, ever."""
+     """The reason it will not read .hashed_password, is because UserRead doesn't have hash present which is present in the user_object under models"""
+
+
+     id: int
+     name: str
+     email: str
+     created_at: datetime
+
+     model_config = ConfigDict(from_attributes=True)
+
