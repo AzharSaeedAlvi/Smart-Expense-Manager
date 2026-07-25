@@ -50,3 +50,51 @@
     - Keep input vs output schemas separate; money stays Decimal (harden later with Field(max_digits, decimal_places)).
     - No new packages -> requirements.txt unchanged.
     - TODO Phase 3: retire DEV_USER_ID; add registration + hashed passwords + JWT login; protect endpoints; isolate users.
+
+
+## 2026-07-25
+
+### Phase 3 — Authentication (DONE)
+
+- Registration with bcrypt-hashed passwords, JWT login, token-gated expense endpoints, every query scoped to the logged-in owner, DEV_USER_ID retired, and two-user isolation proven.
+- Framed the phase as an adversarial (GAN) gap analysis: for each way an attacker could break a naive build, closed the matching gap. The boss gap was #5 — user isolation (IDOR).
+
+- What I built, step by step
+    - Installed the auth toolkit: passlib[bcrypt] (hashing) + PyJWT (tokens) + python-multipart (form login) + python-dotenv; re-froze requirements after each install.
+    - Added a hashed_password column (String, NOT NULL) to the User model; generated + reviewed the Alembic migration.
+    - Rebuilt the local dev DB from scratch (alembic downgrade base -> upgrade head) so NOT NULL applied to empty tables (throwaway data, deliberately wiped).
+    - UserCreate (input: name, email, plaintext password) and UserRead (output: id, name, email, created_at — no password/hash, ever).
+    - security.py: hash_password / verify_password (CryptContext), create_access_token / decode_access_token (HS256, sub + 30-min exp), config loaded from .env.
+    - POST /auth/register — hashes password, stores user, returns 201 UserRead, rejects duplicate email with 409.
+    - Generated a strong SECRET_KEY (secrets.token_hex(32)) into .env; set ACCESS_TOKEN_EXPIRE_MINUTES=30.
+    - POST /auth/login — OAuth2PasswordRequestForm, verifies password vs hash, returns a JWT (Token schema); generic 401 on failure.
+    - get_current_user gatekeeper — pulls the bearer token, verifies signature + expiry, looks up the user by sub, hands the live User to any endpoint via Depends. Proved with GET /auth/me.
+    - Protected all five expense endpoints: create stamps current_user.id; get-one / list / PATCH / DELETE filter by id AND owner.
+    - Deleted the DEV_USER_ID line (grep-confirmed unused first).
+    - Two-user isolation proof: Bob got [] on list and 404 on GET/PATCH/DELETE of User A's row id; A's data untouched.
+
+- Snags & Lessons
+    - passlib vs modern bcrypt clash: first a KeyError, then "password cannot be longer than 72 bytes" on a 14-char password (passlib's internal self-test hit modern bcrypt's hard limit). Fix: pin bcrypt==4.0.1. (passlib is unmaintained; pwdlib is the modern alternative — noted for later.)
+    - KeyError: unknown CryptContext keyword — was a misspelling of "deprecated". Read the traceback bottom-up; library file paths in the stack = not my code.
+    - .env does nothing on its own: os.getenv only READS the environment; load_dotenv() is what LOADS .env into it. SECRET_KEY had no fallback (fail-fast), which is what exposed that .env wasn't being loaded. Added load_dotenv() to security.py and database.py (idempotent, safe to call twice).
+    - "NameError: get_current_user is not defined" — an ordering bug, not a typo. Depends(...) in default args is evaluated at def time, so dependencies must be defined ABOVE the endpoints that use them.
+    - Case-sensitivity typos: OAuth2PasswordBearer (both O and A uppercase — it's an acronym).
+
+- Concepts locked in
+    - Hashing is one-way (can't decrypt); bcrypt is deliberately slow + auto-salted, so identical passwords get different hashes. Even we can't read a user's password.
+    - JWT = header.payload.signature. Payload is base64-encoded, NOT encrypted (readable by anyone) — the signature gives INTEGRITY, not secrecy. Never put secrets in a token.
+    - Authentication (who are you?) != Authorization (are you allowed to touch THIS row?). Scoping every query by current_user.id is what enforces authz.
+    - IDOR: the classic bug where a logged-in user reads someone else's data by guessing an id. Fix: bake the owner check INTO the query (id AND user_id) so a non-owner gets a clean 404.
+    - 404 not 403 for a row you don't own — 403 would leak that the id exists.
+    - Generic "Incorrect email or password" on login avoids user enumeration.
+    - 204 No Content has no body by spec — the status code IS the message.
+    - db.scalars(...) returns objects (not row-tuples); .first() = one-or-None, .all() = list, .one() = exactly-one-or-raise.
+    - Python grammar: ":" describes (type annotations, dict pairs, block headers); "=" assigns (variables, keyword args). Same word can flip: subject: str (annotation) vs subject=... (keyword arg).
+
+- Done when met: register + login work through /docs; all expense endpoints require a valid token; two different users cannot see or modify each other's data (verified); DEV_USER_ID gone.
+
+- Notes
+    - Never commit .env — SECRET_KEY stays local. Rotating the secret invalidates all existing tokens.
+    - deprecated="auto" buys algorithm agility: old hashes keep verifying by their $-prefix; verify_and_update can silently upgrade them at login without a password reset.
+    - "Know this exists" for later (NOT now): refresh tokens, EmailStr + password-strength rules, pwdlib migration, APIRouter split, rate-limiting /auth/login, try/except IntegrityError on register.
+    - TODO Phase 4: (per roadmap — confirm exact tasks next session).
