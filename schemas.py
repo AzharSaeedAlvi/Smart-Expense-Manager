@@ -2,6 +2,13 @@ from datetime import datetime, date
 from decimal import Decimal
 from pydantic import BaseModel, ConfigDict, Field
 
+
+#Phase 3 : The login end point
+
+class Token(BaseModel):
+     access_token: str
+     token_type: str = "bearer"
+
 class ExpenseCreate(BaseModel):
     """Data the CLIENT is allowed to send when creating an expense."""
     amount: Decimal = Field(gt=0)
