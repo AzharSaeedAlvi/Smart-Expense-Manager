@@ -99,3 +99,13 @@
     - deprecated="auto" buys algorithm agility: old hashes keep verifying by their $-prefix; verify_and_update can silently upgrade them at login without a password reset.
     - "Know this exists" for later (NOT now): refresh tokens, EmailStr + password-strength rules, pwdlib migration, APIRouter split, rate-limiting /auth/login, try/except IntegrityError on register.
     - TODO Phase 4: (per roadmap — confirm exact tasks next session).
+
+- Started phase 3(React frontend); confirmed Node.js + npm are installed as the JS-side equivalents of Python + pip before scaffolding.
+
+
+- Notes 
+    - Vite is a scaffolding + dev-server tool for frontend apps.
+    - Confirmed Node v22/ npm 11, then scaffolded a Vite + React(Javascript) app into frontend/ as a sibling of backend/. keeping monorepo layout.
+    - Ran npm install(frontend equivalent of pip install, populates node_modules/) and npm run dev; Vite starter app loads at localhost:5173 with a working useState counter. 
+    - Opened a second terminal so the dev server keeps running; verified via git status and git check-ignore that Vite's nested frontend/.gitignore alread excludes node_modeules before commiting the scafolld, as it is a huge file and we do not want to push that to github.
+    -
