@@ -54,4 +54,4 @@ class Expense(Base):
 
     #Lets you write 'some_expense.user' in Python
 
-    user: Mapped[list["User"]] = relationship(back_populates="expenses")
+    user: Mapped["User"] = relationship(back_populates="expenses")

@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from collections.abc import Generator
 from sqlalchemy.orm import Session
 
-load_dotenv  #ensure that the .env is loaded no matter which module python runs first.
+load_dotenv()  #ensure that the .env is loaded no matter which module python runs first.
 
 
 #Single source of truth for where the database lives. 

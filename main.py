@@ -166,9 +166,9 @@ def update_expense(
 #         setattr(expense, field, value)
 
 
-    db.commit()
-    db.refresh(expense)
-    return expense
+    # db.commit()
+    # db.refresh(expense)
+    # return expense
 
 @app.delete("/expenses/{expense_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_expense(
@@ -203,7 +203,7 @@ def delete_expense(
 
 #Adding the Phase 3 section 
 
-@app.post("/auth/reg", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+@app.post("/auth/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 def register(payload: UserCreate, db: Session = Depends(get_db)):
     existing = db.scalars(select(User).where(User.email == payload.email)).first()
     if existing is not None:

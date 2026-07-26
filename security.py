@@ -35,6 +35,6 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 #A decoded helper : Phase 3   // Check signature and exp
 
 def decode_access_token(token: str) -> dict:
-    return jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
+    return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
 
 
