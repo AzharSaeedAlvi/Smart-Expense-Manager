@@ -100,7 +100,7 @@
     - "Know this exists" for later (NOT now): refresh tokens, EmailStr + password-strength rules, pwdlib migration, APIRouter split, rate-limiting /auth/login, try/except IntegrityError on register.
     - TODO Phase 4: (per roadmap — confirm exact tasks next session).
 
-- Started phase 3(React frontend); confirmed Node.js + npm are installed as the JS-side equivalents of Python + pip before scaffolding.
+# Started phase 4 (React frontend); confirmed Node.js + npm are installed as the JS-side equivalents of Python + pip before scaffolding.
 
 
 - Notes 
@@ -108,4 +108,6 @@
     - Confirmed Node v22/ npm 11, then scaffolded a Vite + React(Javascript) app into frontend/ as a sibling of backend/. keeping monorepo layout.
     - Ran npm install(frontend equivalent of pip install, populates node_modules/) and npm run dev; Vite starter app loads at localhost:5173 with a working useState counter. 
     - Opened a second terminal so the dev server keeps running; verified via git status and git check-ignore that Vite's nested frontend/.gitignore alread excludes node_modeules before commiting the scafolld, as it is a huge file and we do not want to push that to github.
-    -
+    - Commited the untouched React scaffold as a clean "frontend works" checkpoint (subject +why message) and pushed to GitHub; verified node_modules never entered the staging area.
+    - Learned that a React component is a capitalized function returning JSX; replaced Vite's boilerplate App.jsx with my own minimal component and saw it hot-reload live in the browser.
+    - We can add comment inside div in a .jsx file by doing this  { /* content */}

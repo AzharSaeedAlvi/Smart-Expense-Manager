@@ -1,3 +1,5 @@
+from fastapi.middleware.cors import CORSMiddleware
+
 from fastapi import FastAPI, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 
@@ -28,6 +30,13 @@ from security import decode_access_token
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins= ["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
    # Phase 3 Dependency : This needs to be at the top, as this will help us in authorizing the valuse
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl = "auth/login")
