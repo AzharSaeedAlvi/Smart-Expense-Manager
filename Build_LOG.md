@@ -111,3 +111,13 @@
     - Commited the untouched React scaffold as a clean "frontend works" checkpoint (subject +why message) and pushed to GitHub; verified node_modules never entered the staging area.
     - Learned that a React component is a capitalized function returning JSX; replaced Vite's boilerplate App.jsx with my own minimal component and saw it hot-reload live in the browser.
     - We can add comment inside div in a .jsx file by doing this  { /* content */}
+    - A Component Function runs every time it re-renders.
+    - An async function is a special type of function in programming that runs tasks in the background, always returns a Promise, and lets you use the await keyword to pause code execution until a task finishes without freezing the main app.
+    - A Promise is a programming object that acts as a temporary placeholder for a value that is not yet known because the operation delivering it is still incomplete.
+    - #Gotcha fetch doesn not throw an error on a 404 or 500. It only rejectsif the network itself fails. So you must check response.ok yourself. [try/catch/finally]
+    - A component can return different JSX depending on state. 
+    - map() and key is used to turn an array of expense objects into a list of on-screen elements.
+    - Ever element .map() produces needs a key prop.
+    - The key is a table, unique ID that lets React track which row is which across re-renders.
+    - Inline conditional rendering is the practice of emebedding conditional JavaScript logic directly within your UI layout. 
+    - We use early return when the entire component is one state. Inline && is used when only part of UI Changes.

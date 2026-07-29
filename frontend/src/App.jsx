@@ -1,5 +1,7 @@
 import { useState } from "react"
 
+import ExpenseList  from "./ExpenseList"
+
 function App() {           // A component, capital A is required. React treats lowercase names as plain HTML tags, not components.
 const [email, setEmail] = useState('')
 const [password, setPassword] = useState('')
@@ -38,7 +40,7 @@ return(
       value={email}
       onChange={(event) => setEmail(event.target.value)}
     />
-    <input 
+        <input 
       type="password"
       placeholder="password"
       value={password}
@@ -46,6 +48,7 @@ return(
       />
       <button type="submit">Log in</button> 
       </form>
+      <ExpenseList />
   </div>
 )
 }
