@@ -63,7 +63,18 @@ function ExpenseList() {
         }
     }
 
-
+    async function handleDelete(id) {
+        const token = localStorage.getItem('token')
+        const response = await fetch(`http://Localhost:8000/expenses/${id}`, {
+            method: 'DELETE',
+            headers: {Authorization: `Bearer ${token}`},
+        })
+        if(response.ok) {
+            fetchExpenses()
+        } else {
+            console.error('Delete failed', response.status)
+        }
+    }
     return (
         <div>
             <h2>My Expenses</h2>
@@ -92,7 +103,7 @@ function ExpenseList() {
             
             {loading && <p>Loading expenses...</p>}
             {error && <p style ={{color : 'red'}}> {error}</p>}
-            {!loading && error && expenses.length === 0 && (
+            {!loading && !error && expenses.length === 0 && (
                 <p> No expense yet. Add your first one above.</p>
             )}
             {!loading && !error && expenses.length > 0 && (
@@ -100,6 +111,7 @@ function ExpenseList() {
                     {expenses.map((expense) => (
                         <li key={expense.id}>
                             {expense.description} - {expense.amount} on {expense.spent_on}
+                            <button onClick={() => handleDelete(expense.id)}>Delete</button>
                         </li>
                     ))}
                 </ul>

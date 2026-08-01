@@ -5,6 +5,7 @@ import ExpenseList  from "./ExpenseList"
 function App() {           // A component, capital A is required. React treats lowercase names as plain HTML tags, not components.
 const [email, setEmail] = useState('')
 const [password, setPassword] = useState('')
+const [token, setToken] = useState(localStorage.getItem('token'))    // The value inside useState is the initial value of the state variable. Here, we are initializing the token state with the value stored in localStorage (if any). This allows us to persist the user's login state across page reloads.
 
 async function handleSubmit(event) {     //If async is missing, then it would not allow await inside. 
   event.preventDefault()                // Prevent the page from going blank when we submmit.
@@ -24,11 +25,29 @@ async function handleSubmit(event) {     //If async is missing, then it would no
   if (response.ok){
   const data = await response.json()
   localStorage.setItem('token', data.access_token)
+  setToken(data.access_token)
   console.log('Loggedin. Token stored.')
   } else{
   console.log('Login Failed:', response.status)
 }
 }
+
+if(token) {
+  return (
+    <div>
+      <h1> Smart Expense Manager</h1>
+      <button onClick={handleLogout}>Logout</button>
+      <ExpenseList />
+    </div>
+  );
+}
+
+function handleLogout() {
+  localStorage.removeItem('token')   // Remove the token from localStorage
+  setToken(null)
+}
+
+
 
 return(
   <div>
@@ -48,7 +67,7 @@ return(
       />
       <button type="submit">Log in</button> 
       </form>
-      <ExpenseList />
+    
   </div>
 )
 }

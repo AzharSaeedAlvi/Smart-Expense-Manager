@@ -121,3 +121,8 @@
     - The key is a table, unique ID that lets React track which row is which across re-renders.
     - Inline conditional rendering is the practice of emebedding conditional JavaScript logic directly within your UI layout. 
     - We use early return when the entire component is one state. Inline && is used when only part of UI Changes.
+    - DELETE returns 204 No Content => we don't call response.json(), like we do for GET/POST. 
+    - To delete a specific row, you need to tell the handler which id. The right way is to wrap it in an arrow function. Because, if we do not add an arrow, REACT will immediately call it during render. 
+    - Found that login "did nothing until refresh" because React doens't watch localStorage and the list only fetched once on mount; fixed it by lifiting the token into App State(setToken on login) and conditionally rendering login vs. app, sp logging in re-renders instantly. 
+    - Lifted the JWT into App React state(seeded from localStorage, set via setToken on login) and gated the UI on it - loggin in now re-renders into the app instantly instead of a manual refresh. [Same thing mentioned above]
+    - 
