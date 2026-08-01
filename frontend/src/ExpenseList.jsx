@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-function ExpenseList() {
+function ExpenseList({onAuthError}) {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -22,6 +22,12 @@ function ExpenseList() {
       const response = await fetch("http://localhost:8000/expenses", {
         headers: { Authorization: `Bearer ${token}` },
       });
+      if (response.status === 401) {
+        onAuthError();
+        return;
+      }
+      // We explictly checked for 401 before !response.ok because, if we didn't it would have been caught by the !response.ok and we would not have been able to call onAuthError() and handle the logout process.
+
       if (!response.ok) {
         throw new Error(`Request Failed: ${response.status}`);
       }
@@ -38,6 +44,7 @@ function ExpenseList() {
 
   useEffect(() => {
     fetchExpenses();
+    //eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Stub Submit Handler
@@ -57,6 +64,10 @@ function ExpenseList() {
         spent_on: spentOn,
       }),
     });
+    if (response.status === 401) {
+      onAuthError();
+      return;
+    } 
     if (response.ok) {
       setDescription("");
       setAmount("");
@@ -69,10 +80,14 @@ function ExpenseList() {
 
   async function handleDelete(id) {
     const token = localStorage.getItem("token");
-    const response = await fetch(`http://Localhost:8000/expenses/${id}`, {
+    const response = await fetch(`http://localhost:8000/expenses/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
+    if (response.status === 401) {
+      onAuthError();
+      return;
+    } 
     if (response.ok) {
       fetchExpenses();
     } else {

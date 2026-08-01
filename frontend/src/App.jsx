@@ -37,7 +37,8 @@ if(token) {
     <div>
       <h1> Smart Expense Manager</h1>
       <button onClick={handleLogout}>Logout</button>
-      <ExpenseList />
+      <ExpenseList onAuthError={handleLogout} />
+      {/*OnAuthError is a prop that we are passing to the ExpenseList component. It is a function that will be called when the user is not authorized (i.e., when the token is invalid or expired). This allows us to handle the logout process from within the ExpenseList component. */}
     </div>
   );
 }

@@ -127,4 +127,10 @@
     - Lifted the JWT into App React state(seeded from localStorage, set via setToken on login) and gated the UI on it - loggin in now re-renders into the app instantly instead of a manual refresh. [Same thing mentioned above]
     - Ternary Rendering and Fragments.
     - JSON.stringify() convers a JS object, array or primitive value into a JSON-formatted String.
-    - Clicking Save makes my browser send a PATCH note describing the change to your backend; your backend validates who you are, updates the row, and the real save runs db.commit() to write it to SQLite; then the browser re-fetches so the screen matches the database. 
+    - Clicking Save makes my browser send a PATCH note describing the change to your backend; your backend validates who you are, updates the row, and the real save runs db.commit() to write it to SQLite; then the browser re-fetches so the screen matches the database.  
+
+# Phase 4 [Wrapping Things up]
+
+- Notes
+    - Logic that logs out the user lives in App.jsx , But the 401 happens  insides ExpenseList.jsx, to fix that, we will use a prop, that will be used to trigger the event in App.jsx upon receiving the information from ExpenseList.jsx.
+    - 
