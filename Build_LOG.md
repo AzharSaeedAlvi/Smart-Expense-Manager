@@ -125,4 +125,6 @@
     - To delete a specific row, you need to tell the handler which id. The right way is to wrap it in an arrow function. Because, if we do not add an arrow, REACT will immediately call it during render. 
     - Found that login "did nothing until refresh" because React doens't watch localStorage and the list only fetched once on mount; fixed it by lifiting the token into App State(setToken on login) and conditionally rendering login vs. app, sp logging in re-renders instantly. 
     - Lifted the JWT into App React state(seeded from localStorage, set via setToken on login) and gated the UI on it - loggin in now re-renders into the app instantly instead of a manual refresh. [Same thing mentioned above]
-    - 
+    - Ternary Rendering and Fragments.
+    - JSON.stringify() convers a JS object, array or primitive value into a JSON-formatted String.
+    - Clicking Save makes my browser send a PATCH note describing the change to your backend; your backend validates who you are, updates the row, and the real save runs db.commit() to write it to SQLite; then the browser re-fetches so the screen matches the database. 
