@@ -7,40 +7,60 @@ function ExpenseList() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
 
-    const [description, SetDescription] = useState('')
+    const [description, setDescription] = useState('')
     const [amount, setAmount] = useState('')
     const [spentOn, setSpentOn] = useState('')
 
-    useEffect(() => {
         async function fetchExpenses() {
             const token = localStorage.getItem('token')
             try{
-                
-                const response = await fetch('http://localhost:8000/expenses', {
+              const response = await fetch('http://localhost:8000/expenses', {
                     headers: {Authorization: `Bearer ${token}`},
                 })
                 if(!response.ok) {
                     throw new Error(`Request Failed: ${response.status}`)
                 }    
                 const data = await response.json()
-                console.log('Expenses:', data)
+                // console.log('Expenses:', data)
                 setExpenses(data)
                 } catch (err) {
                     setError('Could not load expenses. Please try again.')
-                    console.log(err)
+                    console.error(err)
                 }finally {
                     setLoading(false)
                 }
         }
-        fetchExpenses()
-    }, [])
+
+        useEffect(() => {
+            fetchExpenses()
+        }, [])
 
 
     // Stub Submit Handler 
 
-    function handleAdd(event) {
+    async function handleAdd(event) {
         event.preventDefault()
-        console.log('Would add:', {description, amount, spent_on: spentOn })
+        const token = localStorage.getItem('token')
+        const response = await fetch('http://localhost:8000/expenses', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                description: description,
+                amount: amount,
+                spent_on: spentOn,
+            }),
+        })
+        if(response.ok) {
+            setDescription('')
+            setAmount('')
+            setSpentOn('')
+            fetchExpenses()
+        }else {
+                    console.error('Add failed', response.status)
+        }
     }
 
 
@@ -53,7 +73,7 @@ function ExpenseList() {
                 type = "text"
                 placeholder = "Description"
                 value = {description}
-                onChange = {(event) => SetDescription(event.target.value)}
+                onChange = {(event) => setDescription(event.target.value)}
                 />
                 <input
                 type="number"
