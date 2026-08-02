@@ -34,28 +34,46 @@ function AddExpenseForm({ onAdded, onAuthError }) {
     }
 
     return (
-        <form onSubmit={handleAdd}>
-            <input
-                type="text"
-                placeholder="Description"
-                value={description} 
-                onChange={(event) => setDescription(event.target.value)}
-            />
-            <input
-                type="number"
-                step="0.01"
-                placeholder="Amount"
-                value={amount}
-                onChange={(event) => setAmount(event.target.value)}
-            />
-            <input
-                type="date"
-                placeholder="Spent On"
-                value={spentOn}
-                onChange={(event) => setSpentOn(event.target.value)}
-            />
-            <button type="submit">Add Expense</button>
-        </form>
+      <form
+        onSubmit={handleAdd}
+        className="mb-8 flex flex-col gap-4 rounded-lg bg-gray-50 p-4"
+      >
+        <h3 className="text-lg font-semibold text-gray-900">
+          Add a new expense
+        </h3>
+
+        <input
+          id="description"
+          type="text"
+          placeholder="Description"
+          value={description}
+          onChange={(event) => setDescription(event.target.value)}
+          className="rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 "
+        />
+        <input
+          id="amount"
+          type="number"
+          step="0.01"
+          placeholder="Amount"
+          value={amount}
+          onChange={(event) => setAmount(event.target.value)}
+          className="rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 "
+        />
+        <input
+          id="spent_on"
+          type="date"
+          placeholder="Spent On"
+          value={spentOn}
+          onChange={(event) => setSpentOn(event.target.value)}
+          className="rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 "
+        />
+        <button
+          type="submit"
+          className="rounded-md bg-blue-600 py-2 font-medium text-white transition-colors hover:bg-blue-700"
+        >
+          Add Expense
+        </button>
+      </form>
     );
 }
 

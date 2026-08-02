@@ -2,13 +2,11 @@ import { useState, useEffect } from "react";
 
 import AddExpenseForm from "./AddExpenseForm";
 
-
-function ExpenseList({onAuthError}) {
+function ExpenseList({ onAuthError }) {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
- 
   // Edit States
 
   const [editingId, setEditingId] = useState(null);
@@ -43,13 +41,14 @@ function ExpenseList({onAuthError}) {
   }
 
   useEffect(() => {
+    // State updates happen only after the awaited network request.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchExpenses();
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Stub Submit Handler
 
-  
   async function handleDelete(id) {
     const token = localStorage.getItem("token");
     const response = await fetch(`http://localhost:8000/expenses/${id}`, {
@@ -59,7 +58,7 @@ function ExpenseList({onAuthError}) {
     if (response.status === 401) {
       onAuthError();
       return;
-    } 
+    }
     if (response.ok) {
       fetchExpenses();
     } else {
@@ -101,51 +100,119 @@ function ExpenseList({onAuthError}) {
   }
 
   return (
-    <div>
-      <h2>My Expenses</h2>
-       {/*This is being handled in a AddExepnseForm.jsx file */}
+    <div className="roundded-xl bg-white p-6 shadow-md">
+      <h2 className="mb-6 text-2xl font-semibold text-gray-900">My Expenses</h2>
+      {/*This is being handled in a AddExepnseForm.jsx file */}
 
       <AddExpenseForm onAdded={fetchExpenses} onAuthError={onAuthError} />
-      
-       {/* AddExpenseForm is a child component of ExpenseList. It is responsible for rendering the form to add a new expense. When a new expense is added, it calls the onAdded prop, which is a function passed down from ExpenseList. This function is responsible for refreshing the list of expenses by calling fetchExpenses() again. */}
-    
-      {loading && <p>Loading expenses...</p>}
-      {error && <p style={{ color: "red" }}> {error}</p>}
+
+      {/* AddExpenseForm is a child component of ExpenseList. It is responsible for rendering the form to add a new expense. When a new expense is added, it calls the onAdded prop, which is a function passed down from ExpenseList. This function is responsible for refreshing the list of expenses by calling fetchExpenses() again. */}
+
+      {loading && (
+        <p className="py-8 text-center text-sm text-grey-500">
+          Loading expenses...
+        </p>
+      )}
+
+      {error && (
+        <p className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</p>
+      )}
+
       {!loading && !error && expenses.length === 0 && (
-        <p> No expense yet. Add your first one above.</p>
+        <p className="rounded-lg border border-dashed border-slate-300 py-8 text-center text-sm text-gray-500">
+          No expense yet. Add your first one above.
+        </p>
       )}
       {!loading && !error && expenses.length > 0 && (
-        <ul>
+        <ul className="flex flex-col gap-3">
           {expenses.map((expense) => (
-            <li key={expense.id}>
+            <li
+              key={expense.id}
+              className="rounded-lg border border-slate-200 p-4"
+            >
               {editingId === expense.id ? (
-                <>
+                <div className="flex flex-col gap-3">
                   <input
+                    className="rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     type="text"
                     value={editDescription}
                     onChange={(event) => setEditDescription(event.target.value)}
                   />
                   <input
+                    className="rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     type="number"
                     step="0.1"
                     value={editAmount}
                     onChange={(event) => setEditAmount(event.target.value)}
                   />
                   <input
+                    className="rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     type="date"
                     value={editSpentOn}
                     onChange={(event) => setEditSpentOn(event.target.value)}
                   />
-                  <button onClick={() => handleUpdate(expense.id)}>Save</button>
-                  <button onClick={cancelEdit}>Cancel</button>
-                </>
+                  <div className="flex justify-end gap-2"></div>
+                  <button
+                    type="button"
+                    onClick={() => handleUpdate(expense.id)}
+                    className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    onClick={cancelEdit}
+                    className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+                  >
+                    Cancel
+                  </button>
+                </div>
               ) : (
                 <>
-                  {expense.description} - {expense.amount} on {expense.spent_on}
-                  <button onClick={() => startEdit(expense)}>Edit</button>
-                  <button onClick={() => handleDelete(expense.id)}>
-                    Delete
-                  </button>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <label
+                      htmlFor="description"
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      Description
+                    </label>
+                    <div className="grid min-w-0 flex-1 grid-cols gap-1 text-sm text-gray-700 sm:grid-cols-[minmax(0,1fr)_6rem_7rem] sm:gap-4">
+                      <span className="truncate font-medium text-gray-900">
+                        {expense.description}
+                      </span>
+
+                      <span className="sm:text-right">
+                        <span className="font-medium text-gray-500 sm:hidden">
+                          Amount:{" "}
+                        </span>
+                        {expense.amount}
+                      </span>
+
+                      <span className="sm:text-right">
+                        <span className="font-medium text-gray-500 sm:hidden">
+                          Date:{" "}
+                        </span>
+                        {expense.spent_on}
+                      </span>
+                    </div>
+
+                    <div className="flex shrink-0 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => startEdit(expense)}
+                        className="rounded-md border border-blue-200 px-3 py-1.5 text-sm font-medium text-blue-700 transition-colors hovering:bg-blue-50"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        className="rounded-md border border-blue-200 px-3 py-1.5 text-sm font-medium text-red-700 transition-colors hover:bg-red-50"
+                        onClick={() => handleDelete(expense.id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
                 </>
               )}
             </li>
