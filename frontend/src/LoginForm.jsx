@@ -26,23 +26,26 @@ function LoginForm({ onLoggedIn }) {
     }
 
     return(
-        <div>
-            <form onSubmit={handleSubmit}>
+        
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                 <input
                     type="email"
                     placeholder="Email"
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
-                    />
+                    className="border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
                 <input
                     type="password"
                     placeholder="Password"
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
-                    />
-                <button type="submit">Log in</button>
+                    className="border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button type="submit" className="bg-blue-600 text-white rounded-md py-2 font-medium hover:bg-blue-700 transition-colors">
+                    Log in
+                </button>
             </form>
-        </div>  
     );
 }
 
