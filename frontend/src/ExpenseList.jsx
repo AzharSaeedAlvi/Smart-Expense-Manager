@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 
+import AddExpenseForm from "./AddExpenseForm";
+
+
 function ExpenseList({onAuthError}) {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState("");
-  const [spentOn, setSpentOn] = useState("");
-
+ 
   // Edit States
 
   const [editingId, setEditingId] = useState(null);
@@ -49,35 +49,7 @@ function ExpenseList({onAuthError}) {
 
   // Stub Submit Handler
 
-  async function handleAdd(event) {
-    event.preventDefault();
-    const token = localStorage.getItem("token");
-    const response = await fetch("http://localhost:8000/expenses", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        description: description,
-        amount: amount,
-        spent_on: spentOn,
-      }),
-    });
-    if (response.status === 401) {
-      onAuthError();
-      return;
-    } 
-    if (response.ok) {
-      setDescription("");
-      setAmount("");
-      setSpentOn("");
-      fetchExpenses();
-    } else {
-      console.error("Add failed", response.status);
-    }
-  }
-
+  
   async function handleDelete(id) {
     const token = localStorage.getItem("token");
     const response = await fetch(`http://localhost:8000/expenses/${id}`, {
@@ -131,29 +103,12 @@ function ExpenseList({onAuthError}) {
   return (
     <div>
       <h2>My Expenses</h2>
+       {/*This is being handled in a AddExepnseForm.jsx file */}
 
-      <form onSubmit={handleAdd}>
-        <input
-          type="text"
-          placeholder="Description"
-          value={description}
-          onChange={(event) => setDescription(event.target.value)}
-        />
-        <input
-          type="number"
-          step="0.01"
-          placeholder="Amount"
-          value={amount}
-          onChange={(event) => setAmount(event.target.value)}
-        />
-        <input
-          type="date"
-          value={spentOn}
-          onChange={(event) => setSpentOn(event.target.value)}
-        />
-        <button type="submit"> Add Expense </button>
-      </form>
-
+      <AddExpenseForm onAdded={fetchExpenses} onAuthError={onAuthError} />
+      
+       {/* AddExpenseForm is a child component of ExpenseList. It is responsible for rendering the form to add a new expense. When a new expense is added, it calls the onAdded prop, which is a function passed down from ExpenseList. This function is responsible for refreshing the list of expenses by calling fetchExpenses() again. */}
+    
       {loading && <p>Loading expenses...</p>}
       {error && <p style={{ color: "red" }}> {error}</p>}
       {!loading && !error && expenses.length === 0 && (

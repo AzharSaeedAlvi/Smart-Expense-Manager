@@ -132,6 +132,8 @@
 # Phase 4 [Wrapping Things up]
 
 - Expired/invalid JWT now forces a clean re-login - any authed request returning 401 clears the token and drops the user back to the login screen, via an onAuthError callback passed from App into ExpenseList. 
+- Refactored the UI into focused components; extracted <LoginForm> (owns its login state, reports the token up via onLoggedIn) and <AddExpenseForm> (owns its input state, reports successs via onAdded, and forwards onAuthError); App and Expense List are now thin Coordinators.
+- 
 - Notes
     - Logic that logs out the user lives in App.jsx , But the 401 happens  insides ExpenseList.jsx, to fix that, we will use a prop, that will be used to trigger the event in App.jsx upon receiving the information from ExpenseList.jsx.
     - The {} in function ExpenseList({ onAuthError }) is a destructuring pattern (unpacking a value on the left side), not an object literal(bulding a value on the right side). Same braces, opposite jobs -- one takes apart, one puts together. You'll see this exact pattern on  nearly every React component that takes props, so it's worth having it click now. 
