@@ -32,6 +32,10 @@ class ExpenseUpdate(BaseModel):
         description: str | None = Field(default=None, min_length=1, max_length=255)
         spent_on: date | None = None
 
+#Phase 5
+
+class MonthlyTotalRead(BaseModel):
+     total: Decimal
 
 #Phase 3
 

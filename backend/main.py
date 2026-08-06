@@ -6,10 +6,12 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 from models import Expense
-from schemas import ExpenseCreate, ExpenseRead, ExpenseUpdate
+from schemas import ExpenseCreate, ExpenseRead, ExpenseUpdate, MonthlyTotalRead
+
+from datetime import date
 
 from typing import List 
-from sqlalchemy import select
+from sqlalchemy import select, func
 
 #Phase 3 imports
 
@@ -103,6 +105,31 @@ def list_expenses(
     return expenses
 
 #The above can be read as: Hi, look into the database, get the Expense object and then compare the Expense.user_id object with current_user.id and if it matches return all the expenses, if you would only like 1 expense run .first() instead of .all()
+
+
+@app.get("/insights/monthly-total", response_model=MonthlyTotalRead)
+def get_monthly_total(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+
+    today = date.today()           #Pulls in backend's machine date. 
+    month_start = today.replace(day=1)
+
+    if today.month == 12:
+        next_month_start = date(today.year + 1, 1, 1)
+    else:
+        next_month_start = date(today.year, today.month + 1, 1)
+
+    total = db.scalar(
+        select(func.coalesce(func.sum(Expense.amount), 0)).where(
+            Expense.user_id == current_user.id,
+            Expense.spent_on >= month_start,
+            Expense.spent_on < next_month_start,
+        )
+    )
+
+    return {"total": total}
 
 
 #Commenting this out as this is works even without authorization
