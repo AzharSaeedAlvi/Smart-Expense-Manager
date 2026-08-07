@@ -165,4 +165,4 @@
 - Added authenticated, owner-scoped GET /reports/monthly: filters expenses by an explicit inclusive start/end date range, rejects reversed ranges with 400, and gets 422 on unparsable dates for free via date type hint. 
 - Added GET /report/monthly.csv: streams a downloadable CSV of the date-range expenses using the csv module + io.StringIO + StreamingResponse with a Content-Disposition attachment header. (Bug  vaught: writer.writerow was initially outside the for loop, so only one row wrote.)
 - Refactored both report endpoints onto a shared _expenses_in_range() helper (validation + owner-scoped date-range query), removing duplicated logic so the range rules live in one place.
- 
+- Added an Export CSV button to the React dashboard: fetches /reports/monthly.csv with the auth header, downloads the current month via a Blob + object URL + programmatic anchor click, and resues the 401 -> onAuthError logout path. 

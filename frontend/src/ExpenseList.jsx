@@ -168,6 +168,46 @@ function ExpenseList({ onAuthError }) {
     }
   }
 
+  async function handleExportCsv() {
+    const token = localStorage.getItem("token");
+
+    //Build the current month's range as YYYY--MM--DD strings. 
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();    // getMonth() is 0-indexed (Jan = 0)
+    const pad = (n) => String(n).padStart(2, "0");
+    const start = `${year}-${pad(month + 1)}-01`;
+    const lastDay = new Date(year, month + 1, 0).getDate();  // day 0 of next month = last day of this one
+    const end = `${year}-${pad(month + 1)}-${pad(lastDay)}`;
+
+    const response = await fetch(
+      `http://localhost:8000/reports/monthly.csv?start=${start}&end=${end}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
+
+    if (response.status === 401) {
+      onAuthError();
+      return;
+    }
+    if(!response.ok) {
+      console.error("Export Failed", response.status);
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link =  document.createElement("a");
+    link.href = url;
+    link.downlaod= `expenses_${start}_${end}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+
+  }
+
   return (
     <div className="rounded-xl bg-white p-6 shadow-md">
       <h2 className="mb-6 text-2xl font-semibold text-gray-900">My Expenses</h2>
@@ -177,6 +217,14 @@ function ExpenseList({ onAuthError }) {
         <p className="text-sm font-medium text-blue-700">Spent this month</p>
         <p className="mt-1 text-3xl font-bold text-blue-900">{monthlyTotal}</p>
       </div>
+
+      <button 
+        type="button"
+        onClick={handleExportCsv}
+        className="mb-6 rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+        >
+          Export CSV
+        </button>
 
       {monthComparison && (
         <div className="mb-6 rounded-lg bg-slate-100 p-4">
