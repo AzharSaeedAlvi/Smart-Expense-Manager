@@ -210,6 +210,24 @@ def get_month_over_month(
         "change_percentage": change_percentage,
     }
 
+def _expenses_in_range(
+    start: date,
+    end: date,
+    db: Session,
+    current_user: User,
+) -> list[Expense]:
+    if start>end:
+        raise HTTPException(
+            status_code=400,
+            detail= "Start date must be on or before end date",
+        )
+    return db.scalars(
+        select(Expense).where(
+            Expense.user_id == current_user.id,
+            Expense.spent_on >= start,
+            Expense.spent_on <= end,
+        )
+    ).all()
 
 @app.get("/reports/monthly", response_model=List[ExpenseRead])
 def get_monthly_report(
@@ -218,19 +236,8 @@ def get_monthly_report(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    if start > end:
-        raise HTTPException(
-            status_code=400,
-            detail="start date must be on or before end date",
-        )
-    expenses = db.scalars(
-        select(Expense).where(
-            Expense.user_id == current_user.id,
-            Expense.spent_on >= start,
-            Expense.spent_on <= end
-        )
-    ).all()
-    return expenses
+
+    return _expenses_in_range(start, end, db, current_user)
 
 
 @app.get("/reports/monthly.csv")
@@ -241,18 +248,7 @@ def export_monthly_report_csv(
     current_user: User = Depends(get_current_user),
 ):
 
-    if start > end:
-        raise HTTPException(
-            status_code=400,
-            detail="start date must be on or before end date",
-        )
-    expenses = db.scalars(
-        select(Expense).where(
-            Expense.user_id == current_user.id,
-            Expense.spent_on >= start,
-            Expense.spent_on <= end,
-        )
-    ).all()
+    expenses = _expenses_in_range(start, end, db, current_user)
 
     buffer = io.StringIO()
     writer= csv.writer(buffer)
