@@ -205,13 +205,29 @@ def get_month_over_month(
         "change_amount": change_amount,
         "change_percentage": change_percentage,
     }
-    
 
 
+@app.get("/reports/monthly", response_model=List[ExpenseRead])
+def get_monthly_report(
+    start: date,
+    end: date,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    if start > end:
+        raise HTTPException(
+            status_code=400,
+            detail="start date must be on or before end date",
+        )
+    expenses = db.scalars(
+        select(Expense).where(
+            Expense.user_id == current_user.id,
+            Expense.spent_on >= start,
+            Expense.spent_on <= end
+        )
+    ).all()
+    return expenses
 
-#Commenting this out as this is works even without authorization
-# def list_expenses(db: Session = Depends(get_db)):
-#     return db.scalars(select(Expense)).all()
 
 #This will ensure that that only if the User id and owner matches only then it works.
 

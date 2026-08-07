@@ -157,4 +157,9 @@
     - Add the month-over-month end point has 2 task
         - Ask the databbase for two totals
         - Compare those totals in Python
-    -
+    
+
+# Phase 6
+
+- IMPORTANT: Any function parameter that isn't in the path and is a plain scalar type automatically becomes a query parameter. 
+- Added authenticated, owner-scoped GET /reports/monthly: filters expenses by an explicit inclusive start/end date range, rejects reversed ranges with 400, and gets 422 on unparsable dates for free via date type hint. 
