@@ -28,7 +28,7 @@ function App() {
             </h1>
             <button
               onClick={handleLogout}
-              className="text-sm text-slate-600 border border-slate-300 rounded-md px-3 py-1.5 jpver:bg-slate-50 hover:text-slate-900  transition-colors"
+              className="text-sm text-slate-600 border border-slate-300 rounded-md px-3 py-1.5 hover:bg-slate-50 hover:text-slate-900  transition-colors"
             >
               Logout
             </button>

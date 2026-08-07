@@ -62,14 +62,14 @@ function ExpenseList({ onAuthError }) {
         },
       );
 
-      if (totalResponse.status == 401) {
+      if (totalResponse.status === 401) {
         onAuthError();
         return;
       }
 
       if (!totalResponse.ok) {
         throw new Error(
-          `Monthly total request failed: $(totalResponse.status)`,
+          `Monthly total request failed: ${totalResponse.status}`,
         );
       }
 
@@ -169,13 +169,13 @@ function ExpenseList({ onAuthError }) {
   }
 
   return (
-    <div className="roundded-xl bg-white p-6 shadow-md">
+    <div className="rounded-xl bg-white p-6 shadow-md">
       <h2 className="mb-6 text-2xl font-semibold text-gray-900">My Expenses</h2>
       {/*This is being handled in a AddExepnseForm.jsx file */}
 
       <div className="mb-6 rounded-lg bg-blue-50 p-4">
         <p className="text-sm font-medium text-blue-700">Spent this month</p>
-        <p className="mt-1 text-3x1 font-bold text-blue-900">{monthlyTotal}</p>
+        <p className="mt-1 text-3xl font-bold text-blue-900">{monthlyTotal}</p>
       </div>
 
       {monthComparison && (
@@ -189,9 +189,6 @@ function ExpenseList({ onAuthError }) {
           </p>
 
           <p className="mt-1 text-sm text-slate-600">
-            {/* {monthComparison.change_percentage === null
-            ? "No previous-month spending to compare"
-            : `${monthComparison.change_percentage}% change` } */}
             {buildComparisonText(monthComparison)}
           </p>
         </div>
@@ -202,7 +199,7 @@ function ExpenseList({ onAuthError }) {
       {/* AddExpenseForm is a child component of ExpenseList. It is responsible for rendering the form to add a new expense. When a new expense is added, it calls the onAdded prop, which is a function passed down from ExpenseList. This function is responsible for refreshing the list of expenses by calling fetchExpenses() again. */}
 
       {loading && (
-        <p className="py-8 text-center text-sm text-grey-500">
+        <p className="py-8 text-center text-sm text-gray-500">
           Loading expenses...
         </p>
       )}
@@ -293,7 +290,7 @@ function ExpenseList({ onAuthError }) {
                       <button
                         type="button"
                         onClick={() => startEdit(expense)}
-                        className="rounded-md border border-blue-200 px-3 py-1.5 text-sm font-medium text-blue-700 transition-colors hovering:bg-blue-50"
+                        className="rounded-md border border-blue-200 px-3 py-1.5 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-50"
                       >
                         Edit
                       </button>

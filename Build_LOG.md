@@ -146,6 +146,9 @@
 - Added an owner-scoped month-over-month endpoint that compares databae-aggregated current and previous totals, returns amount and percentage changes, and safely handles a zero previous month.
 - Added an automatically refreshing month-over-month dashboard card with plain-language increase or decrease messaging while preserving signed API.
 - Fixed missing 401 handling in handleUpdate(): a PATCH with an expired/invalid token now forces a cleam re-login via onAuthError() instead of a silently failing, matching fetchExpenses() and handleDelete().
+- Cleaned up fetchExpenses monthly-total block: fixed a broken template literal ($(...) -> ${...}) so the error message shows the real HTTP status, and switched the 401 check from == to === for consistency with the other status checks.
+- Fixed silent Tailwind class typos.
+- Removed the superseded commented-out ternary from the month-over-month card; buildComparisonText() is now the single, clear source of the comparison text.
 - Notes:
     - Helper Function : Function that holds reusable logic.
     - _, convention implies that the value was returned, but we intentionally do not need it there. [unused]
