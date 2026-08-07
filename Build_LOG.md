@@ -163,3 +163,4 @@
 
 - IMPORTANT: Any function parameter that isn't in the path and is a plain scalar type automatically becomes a query parameter. 
 - Added authenticated, owner-scoped GET /reports/monthly: filters expenses by an explicit inclusive start/end date range, rejects reversed ranges with 400, and gets 422 on unparsable dates for free via date type hint. 
+- Added GET /report/monthly.csv: streams a downloadable CSV of the date-range expenses using the csv module + io.StringIO + StreamingResponse with a Content-Disposition attachment header. (Bug  vaught: writer.writerow was initially outside the for loop, so only one row wrote.)

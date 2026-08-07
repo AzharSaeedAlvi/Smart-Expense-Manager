@@ -1,3 +1,7 @@
+import csv
+import io
+from fastapi.responses import StreamingResponse
+
 from fastapi.middleware.cors import CORSMiddleware
 
 from fastapi import FastAPI, Depends, status, HTTPException
@@ -227,6 +231,45 @@ def get_monthly_report(
         )
     ).all()
     return expenses
+
+
+@app.get("/reports/monthly.csv")
+def export_monthly_report_csv(
+    start: date,
+    end: date,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+
+    if start > end:
+        raise HTTPException(
+            status_code=400,
+            detail="start date must be on or before end date",
+        )
+    expenses = db.scalars(
+        select(Expense).where(
+            Expense.user_id == current_user.id,
+            Expense.spent_on >= start,
+            Expense.spent_on <= end,
+        )
+    ).all()
+
+    buffer = io.StringIO()
+    writer= csv.writer(buffer)
+    writer.writerow(["id", "description", "amount", "spent_on"])
+    for expense in expenses:
+        writer.writerow(
+            [expense.id, expense.description, expense.amount, expense.spent_on]
+        )
+    buffer.seek(0)
+
+    filename = f"expenses_{start}_{end}.csv"
+    return StreamingResponse(
+        buffer,
+        media_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
 
 
 #This will ensure that that only if the User id and owner matches only then it works.
