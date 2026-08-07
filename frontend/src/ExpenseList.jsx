@@ -2,9 +2,30 @@ import { useState, useEffect } from "react";
 
 import AddExpenseForm from "./AddExpenseForm";
 
+//Helper Function to make it easier to read percentages
+
+function buildComparisonText(comparison) {
+  if(comparison.change_percentage === null) {
+    return "no previous-month spending to compare";
+  }
+
+  const percentage = Number(comparison.change_percentage);
+
+  if(percentage > 0) {
+    return `${Math.abs(percentage)}% more than last month`;
+  }
+
+  if(percentage < 0) {
+  return `${Math.abs(percentage)}% less than last month`;
+}
+
+return "Spending is unchanged from last month";
+  }
+
 function ExpenseList({ onAuthError }) {
   const [expenses, setExpenses] = useState([]);
   const [monthlyTotal, setMonthlyTotal] = useState("0.00");
+  const [monthComparison, setMonthComparison] = useState(null); //Display comparison state:
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -37,21 +58,45 @@ function ExpenseList({ onAuthError }) {
       const totalResponse = await fetch(
         "http://localhost:8000/insights/monthly-total",
         {
-          headers: {Authorization: `Bearer ${token}`},
-        }
+          headers: { Authorization: `Bearer ${token}` },
+        },
       );
 
-      if(totalResponse.status==401){
+      if (totalResponse.status == 401) {
         onAuthError();
         return;
       }
-      
-      if(!totalResponse.ok) {
-        throw new Error (`Monthly total request failed: $(totalResponse.status)`);
+
+      if (!totalResponse.ok) {
+        throw new Error(
+          `Monthly total request failed: $(totalResponse.status)`,
+        );
       }
 
       const totalData = await totalResponse.json();
       setMonthlyTotal(totalData.total);
+      
+      const comparisonResponse = await fetch(
+        "http://localhost:8000/insights/month-over-month",
+        {
+          headers: {Authorization: `Bearer ${token}`},
+        },
+      );
+
+      if(comparisonResponse.status === 401) {
+        onAuthError();
+        return;
+      }
+
+      if(!comparisonResponse.ok){
+        throw new Error(
+          `Month comparison request failed: ${comparisonResponse.status}`,
+        );
+      }
+
+      const comparisonData = await comparisonResponse.json();
+      setMonthComparison(comparisonData);
+
     } catch (err) {
       setError("Could not load expenses. Please try again.");
       console.error(err);
@@ -128,7 +173,26 @@ function ExpenseList({ onAuthError }) {
         <p className="text-sm font-medium text-blue-700">Spent this month</p>
         <p className="mt-1 text-3x1 font-bold text-blue-900">{monthlyTotal}</p>
       </div>
-      
+
+      {monthComparison && (
+        <div className="mb-6 rounded-lg bg-slate-100 p-4">
+          <p className="text-sm font-medium text-slate-600">
+            Comapred with last month
+          </p>
+
+          <p className="mt-1 text-xl font-bold text-slate-900">
+            {Math.abs(Number(monthComparison.change_amount)).toFixed(2)}
+          </p>
+
+          <p className="mt-1 text-sm text-slate-600">
+            {/* {monthComparison.change_percentage === null
+            ? "No previous-month spending to compare"
+            : `${monthComparison.change_percentage}% change` } */}
+            {buildComparisonText(monthComparison)}
+          </p>
+        </div>
+      )}
+
       <AddExpenseForm onAdded={fetchExpenses} onAuthError={onAuthError} />
 
       {/* AddExpenseForm is a child component of ExpenseList. It is responsible for rendering the form to add a new expense. When a new expense is added, it calls the onAdded prop, which is a function passed down from ExpenseList. This function is responsible for refreshing the list of expenses by calling fetchExpenses() again. */}
