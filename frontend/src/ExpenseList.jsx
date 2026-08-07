@@ -156,6 +156,10 @@ function ExpenseList({ onAuthError }) {
         spent_on: editSpentOn,
       }),
     });
+    if(response.status === 401) {
+      onAuthError()
+      return;
+    }
     if (response.ok) {
       setEditingId(null); // Updating the setEditingID to null, exits the edit mode.
       fetchExpenses();
