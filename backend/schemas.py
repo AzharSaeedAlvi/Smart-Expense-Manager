@@ -37,6 +37,13 @@ class ExpenseUpdate(BaseModel):
 class MonthlyTotalRead(BaseModel):
      total: Decimal
 
+class MonthOverMonthRead(BaseModel):
+     current_month_total: Decimal
+     previous_month_total: Decimal
+     change_amount: Decimal
+     change_percentage: Decimal | None
+
+
 #Phase 3
 
 class UserCreate(BaseModel):

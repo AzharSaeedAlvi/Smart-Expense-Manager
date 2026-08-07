@@ -6,7 +6,9 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 from models import Expense
-from schemas import ExpenseCreate, ExpenseRead, ExpenseUpdate, MonthlyTotalRead
+from schemas import (
+ExpenseCreate, ExpenseRead, ExpenseUpdate, MonthlyTotalRead, MonthOverMonthRead
+)
 
 from datetime import date
 
@@ -22,6 +24,7 @@ from security import hash_password
 from fastapi.security import OAuth2PasswordRequestForm
 from schemas import Token
 from security import   verify_password, create_access_token
+
 
 
 #Phase 3 : Dependency 
@@ -71,6 +74,31 @@ def get_current_user(
 def read_root():
     return {"message": "Hello, World!"}
 
+def get_month_boundaries(
+        reference_date: date,
+) -> tuple[date, date, date]:
+    current_start = reference_date.replace(day=1)
+
+    if current_start.month == 1:
+        previous_start = date(current_start.year - 1, 12, 1)
+    else:
+        previous_start = date(
+            current_start.year,
+            current_start.month - 1,
+            1,
+        )
+    if current_start.month == 12:
+        next_start = date(current_start.year + 1, 1, 1)
+    else:
+        next_start = date(
+            current_start.year,
+            current_start.month + 1,
+            1,
+        )
+
+    return previous_start, current_start, next_start
+
+
 @app.post("/expenses", response_model=ExpenseRead, status_code=status.HTTP_201_CREATED)
 def create_expense(
     payload: ExpenseCreate,
@@ -113,13 +141,15 @@ def get_monthly_total(
     current_user: User = Depends(get_current_user),
 ):
 
-    today = date.today()           #Pulls in backend's machine date. 
-    month_start = today.replace(day=1)
+    _, month_start, next_month_start = get_month_boundaries(date.today())   #Helper function.
 
-    if today.month == 12:
-        next_month_start = date(today.year + 1, 1, 1)
-    else:
-        next_month_start = date(today.year, today.month + 1, 1)
+    # today = date.today()           #Pulls in backend's machine date. 
+    # month_start = today.replace(day=1)
+
+    # if today.month == 12:
+    #     next_month_start = date(today.year + 1, 1, 1)
+    # else:
+    #     next_month_start = date(today.year, today.month + 1, 1)
 
     total = db.scalar(
         select(func.coalesce(func.sum(Expense.amount), 0)).where(
@@ -130,6 +160,53 @@ def get_monthly_total(
     )
 
     return {"total": total}
+
+
+@app.get("/insights/month-over-month", 
+         response_model=MonthOverMonthRead,
+)
+def get_month_over_month(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    previous_start, current_start, next_start = get_month_boundaries(
+        date.today()
+    )
+
+    previous_total = db.scalar(
+        select(func.coalesce(func.sum(Expense.amount), 0)).where(
+            Expense.user_id == current_user.id,
+            Expense.spent_on >= previous_start,
+            Expense.spent_on < current_start,
+        )
+    )
+
+    current_total = db.scalar(
+        select(func.coalesce(func.sum(Expense.amount), 0)).where(
+            Expense.user_id == current_user.id,
+            Expense.spent_on >= current_start, 
+            Expense.spent_on < next_start,
+
+        )
+    )
+
+    change_amount = current_total - previous_total
+
+    change_percentage = None
+    if previous_total !=0:
+        change_percentage = round(
+            (change_amount/previous_total)* 100,
+            2,
+        )
+
+    return {
+        "current_month_total": current_total,
+        "previous_month_total": previous_total,
+        "change_amount": change_amount,
+        "change_percentage": change_percentage,
+    }
+    
+
 
 
 #Commenting this out as this is works even without authorization

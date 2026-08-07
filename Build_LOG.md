@@ -143,3 +143,14 @@
 
 
 - Displayed the owner-scoper monthly total in the React dashboard and verified that it refreshes automatically after expense change.
+- Added an owner-scoped month-over-month endpoint that compares databae-aggregated current and previous totals, returns amount and percentage changes, and safely handles a zero previous month.
+- 
+- Notes:
+    - Helper Function : Function that holds reusable logic.
+    - _, convention implies that the value was returned, but we intentionally do not need it there. [unused]
+    - Tuple :  ordered collection of values grouped together (unlike list, it is fixed)
+    - We prefer to use SQL instead of python, as python would fetch every expense into itself and loop through them, which is inefficient. 
+    - Add the month-over-month end point has 2 task
+        - Ask the databbase for two totals
+        - Compare those totals in Python
+    -
