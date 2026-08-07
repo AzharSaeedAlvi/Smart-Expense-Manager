@@ -144,7 +144,7 @@
 
 - Displayed the owner-scoper monthly total in the React dashboard and verified that it refreshes automatically after expense change.
 - Added an owner-scoped month-over-month endpoint that compares databae-aggregated current and previous totals, returns amount and percentage changes, and safely handles a zero previous month.
-- Added an automatically refreshing month-over-month dashboard card with plain-language increase or decrease messaging while preserving signed API values.
+- Added an automatically refreshing month-over-month dashboard card with plain-language increase or decrease messaging while preserving signed API.
 - Notes:
     - Helper Function : Function that holds reusable logic.
     - _, convention implies that the value was returned, but we intentionally do not need it there. [unused]
