@@ -138,3 +138,8 @@
 - Notes
     - Logic that logs out the user lives in App.jsx , But the 401 happens  insides ExpenseList.jsx, to fix that, we will use a prop, that will be used to trigger the event in App.jsx upon receiving the information from ExpenseList.jsx.
     - The {} in function ExpenseList({ onAuthError }) is a destructuring pattern (unpacking a value on the left side), not an object literal(bulding a value on the right side). Same braces, opposite jobs -- one takes apart, one puts together. You'll see this exact pattern on  nearly every React component that takes props, so it's worth having it click now. 
+
+# Phase 5
+
+
+- Displayed the owner-scoper monthly total in the React dashboard and verified that it refreshes automatically after expense change.

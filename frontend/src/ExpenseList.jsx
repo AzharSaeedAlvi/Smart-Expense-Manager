@@ -4,6 +4,7 @@ import AddExpenseForm from "./AddExpenseForm";
 
 function ExpenseList({ onAuthError }) {
   const [expenses, setExpenses] = useState([]);
+  const [monthlyTotal, setMonthlyTotal] = useState("0.00");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -32,6 +33,25 @@ function ExpenseList({ onAuthError }) {
       const data = await response.json();
       // console.log('Expenses:', data)
       setExpenses(data);
+
+      const totalResponse = await fetch(
+        "http://localhost:8000/insights/monthly-total",
+        {
+          headers: {Authorization: `Bearer ${token}`},
+        }
+      );
+
+      if(totalResponse.status==401){
+        onAuthError();
+        return;
+      }
+      
+      if(!totalResponse.ok) {
+        throw new Error (`Monthly total request failed: $(totalResponse.status)`);
+      }
+
+      const totalData = await totalResponse.json();
+      setMonthlyTotal(totalData.total);
     } catch (err) {
       setError("Could not load expenses. Please try again.");
       console.error(err);
@@ -104,6 +124,11 @@ function ExpenseList({ onAuthError }) {
       <h2 className="mb-6 text-2xl font-semibold text-gray-900">My Expenses</h2>
       {/*This is being handled in a AddExepnseForm.jsx file */}
 
+      <div className="mb-6 rounded-lg bg-blue-50 p-4">
+        <p className="text-sm font-medium text-blue-700">Spent this month</p>
+        <p className="mt-1 text-3x1 font-bold text-blue-900">{monthlyTotal}</p>
+      </div>
+      
       <AddExpenseForm onAdded={fetchExpenses} onAuthError={onAuthError} />
 
       {/* AddExpenseForm is a child component of ExpenseList. It is responsible for rendering the form to add a new expense. When a new expense is added, it calls the onAdded prop, which is a function passed down from ExpenseList. This function is responsible for refreshing the list of expenses by calling fetchExpenses() again. */}
