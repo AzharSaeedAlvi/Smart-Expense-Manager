@@ -42,6 +42,7 @@ class Expense(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     amount: Mapped[Decimal] = mapped_column(Numeric(10,2))
     description: Mapped[str] = mapped_column(String(255))
+    category: Mapped[str | None] = mapped_column(String(50), nullable=True)
     spent_on: Mapped[date] = mapped_column(Date)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
 
