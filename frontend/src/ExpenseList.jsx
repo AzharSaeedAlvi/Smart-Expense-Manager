@@ -200,7 +200,7 @@ function ExpenseList({ onAuthError }) {
     const url = URL.createObjectURL(blob);
     const link =  document.createElement("a");
     link.href = url;
-    link.downlaod= `expenses_${start}_${end}.csv`;
+    link.download= `expenses_${start}_${end}.csv`;
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -229,7 +229,7 @@ function ExpenseList({ onAuthError }) {
       {monthComparison && (
         <div className="mb-6 rounded-lg bg-slate-100 p-4">
           <p className="text-sm font-medium text-slate-600">
-            Comapred with last month
+            Compared with last month
           </p>
 
           <p className="mt-1 text-xl font-bold text-slate-900">
