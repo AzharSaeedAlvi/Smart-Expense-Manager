@@ -248,10 +248,10 @@ def export_monthly_report_csv(
 
     buffer = io.StringIO()
     writer= csv.writer(buffer)
-    writer.writerow(["id", "description", "amount", "spent_on"])
+    writer.writerow(["id", "description","category", "amount", "spent_on"])
     for expense in expenses:
         writer.writerow(
-            [expense.id, expense.description, expense.amount, expense.spent_on]
+            [expense.id, expense.description, expense.category, expense.amount, expense.spent_on]
         )
     buffer.seek(0)
 

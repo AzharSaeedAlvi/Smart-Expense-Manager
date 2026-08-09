@@ -184,3 +184,4 @@
 - Memoization : The technique of caching a function's result by its input.
 - The cache write goes on the success path only.
 - Added description-lvel memoization to LLMCategorizer (normalized key, caches only successful LLM results, never fallbacks) and switched the except to log the error instead of swallowing it. Verified cache hit with zero API calls (kFc -> cached 'kfc' -> Food). Model pinned to gemini-flash-latest after 2.5 models 404'd for new keys and 2.0-flash returned free-tier limit:0.
+- Add Category colum (between description and amount) to export header and data rows; uncategorized rows render as a blank cell.
