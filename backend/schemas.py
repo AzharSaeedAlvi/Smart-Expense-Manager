@@ -14,6 +14,7 @@ class ExpenseCreate(BaseModel):
     amount: Decimal = Field(gt=0)
     description: str = Field(min_length=1, max_length=255)
     spent_on: date
+    category: str | None = Field(default=None, max_length=50)
     # add your other client-supplied columns here to match models.py
 
 class ExpenseRead(BaseModel):
@@ -24,6 +25,7 @@ class ExpenseRead(BaseModel):
     created_at: datetime
     updated_at: datetime
     spent_on: date        #added this for a fix. 
+    category: str | None = None
     model_config = ConfigDict(from_attributes=True)  # tells Pydantic to read data from ORM objects
 
 

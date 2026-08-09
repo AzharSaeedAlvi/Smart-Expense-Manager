@@ -103,6 +103,22 @@ def get_month_boundaries(
     return previous_start, current_start, next_start
 
 
+CATEGORY_RULES = {
+    "Food": ["swiggy", "zomato", "restaurant", "cafe", "coffee", "pizza"],
+    "Transport": ["uber", "ola", "cab", "fuel", "petrol", "metro"],
+    "Shopping": ["amazon", "flipkart", "myntra", "mall"],
+    "Utilities": ["electricity", "water", "gas", "internet", "wifi", "recharge"],
+    "Entertainment": ["netflix", "spotify", "movie", "bookmyshow"],
+}
+
+def categorize(description: str) -> str | None:
+    text = description.lower()
+    for category, keywords in CATEGORY_RULES.items():
+        if any(keyword in text for keyword in keywords):
+            return category
+    return None
+
+
 @app.post("/expenses", response_model=ExpenseRead, status_code=status.HTTP_201_CREATED)
 def create_expense(
     payload: ExpenseCreate,
@@ -110,7 +126,10 @@ def create_expense(
     current_user: User = Depends(get_current_user),
 ):
 
-    expense = Expense(**payload.model_dump(), user_id=current_user.id)
+    data = payload.model_dump()
+    if data.get("category") is None:
+            data["category"] = categorize(data["description"])
+    expense = Expense(**data, user_id=current_user.id)
     db.add(expense)
     db.commit()
     db.refresh(expense)
