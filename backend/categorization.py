@@ -38,7 +38,10 @@ class RulesCategorizer:
         return None
 
 class LLMCategorizer:
-    """LLM-backed categorizer. STUB for now: returns None until the real call is wired in."""
+    """LLM-backed categorizer. 
+    
+        Calls Gemini with a category-constrained prompt, validates the reply agains the allowed categories, caches successful results in memory, and falls back to the rules categorizer on an API error.
+    """
 
     def __init__(self):
         api_key = os.environ["GEMINI_API_KEY"]    #Fail loud if LLM is ON but no key
@@ -80,7 +83,7 @@ class LLMCategorizer:
 
 
 
-def get_catergorizer() -> Categorizer:
+def get_categorizer() -> Categorizer:
     """Pick the categorizer based on the CATEGORIZER env var. Defaults to rules."""
     kind = os.getenv("CATEGORIZER", "rules").strip().lower()
     if kind == "llm":
@@ -90,4 +93,4 @@ def get_catergorizer() -> Categorizer:
     #Unknown values fall back to rules for safety; the "llm" branch comes next step. 
     return RulesCategorizer()
 
-default_categorizer: Categorizer = get_catergorizer()
+default_categorizer: Categorizer = get_categorizer()
