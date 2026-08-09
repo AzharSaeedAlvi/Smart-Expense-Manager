@@ -5,22 +5,22 @@ import AddExpenseForm from "./AddExpenseForm";
 //Helper Function to make it easier to read percentages
 
 function buildComparisonText(comparison) {
-  if(comparison.change_percentage === null) {
+  if (comparison.change_percentage === null) {
     return "no previous-month spending to compare";
   }
 
   const percentage = Number(comparison.change_percentage);
 
-  if(percentage > 0) {
+  if (percentage > 0) {
     return `${Math.abs(percentage)}% more than last month`;
   }
 
-  if(percentage < 0) {
-  return `${Math.abs(percentage)}% less than last month`;
-}
-
-return "Spending is unchanged from last month";
+  if (percentage < 0) {
+    return `${Math.abs(percentage)}% less than last month`;
   }
+
+  return "Spending is unchanged from last month";
+}
 
 function ExpenseList({ onAuthError }) {
   const [expenses, setExpenses] = useState([]);
@@ -35,6 +35,7 @@ function ExpenseList({ onAuthError }) {
   const [editDescription, setEditDescription] = useState("");
   const [editAmount, setEditAmount] = useState("");
   const [editSpentOn, setEditSpentOn] = useState("");
+  const [editCategory, setEditCategory] = useState("");
 
   async function fetchExpenses() {
     const token = localStorage.getItem("token");
@@ -75,20 +76,20 @@ function ExpenseList({ onAuthError }) {
 
       const totalData = await totalResponse.json();
       setMonthlyTotal(totalData.total);
-      
+
       const comparisonResponse = await fetch(
         "http://localhost:8000/insights/month-over-month",
         {
-          headers: {Authorization: `Bearer ${token}`},
+          headers: { Authorization: `Bearer ${token}` },
         },
       );
 
-      if(comparisonResponse.status === 401) {
+      if (comparisonResponse.status === 401) {
         onAuthError();
         return;
       }
 
-      if(!comparisonResponse.ok){
+      if (!comparisonResponse.ok) {
         throw new Error(
           `Month comparison request failed: ${comparisonResponse.status}`,
         );
@@ -96,7 +97,6 @@ function ExpenseList({ onAuthError }) {
 
       const comparisonData = await comparisonResponse.json();
       setMonthComparison(comparisonData);
-
     } catch (err) {
       setError("Could not load expenses. Please try again.");
       console.error(err);
@@ -136,6 +136,7 @@ function ExpenseList({ onAuthError }) {
     setEditDescription(expense.description);
     setEditAmount(expense.amount);
     setEditSpentOn(expense.spent_on);
+    setEditCategory(expense.category || "");
   }
 
   function cancelEdit() {
@@ -154,10 +155,11 @@ function ExpenseList({ onAuthError }) {
         description: editDescription,
         amount: editAmount,
         spent_on: editSpentOn,
+        category: editCategory.trim() || null,
       }),
     });
-    if(response.status === 401) {
-      onAuthError()
+    if (response.status === 401) {
+      onAuthError();
       return;
     }
     if (response.ok) {
@@ -171,13 +173,13 @@ function ExpenseList({ onAuthError }) {
   async function handleExportCsv() {
     const token = localStorage.getItem("token");
 
-    //Build the current month's range as YYYY--MM--DD strings. 
+    //Build the current month's range as YYYY--MM--DD strings.
     const now = new Date();
     const year = now.getFullYear();
-    const month = now.getMonth();    // getMonth() is 0-indexed (Jan = 0)
+    const month = now.getMonth(); // getMonth() is 0-indexed (Jan = 0)
     const pad = (n) => String(n).padStart(2, "0");
     const start = `${year}-${pad(month + 1)}-01`;
-    const lastDay = new Date(year, month + 1, 0).getDate();  // day 0 of next month = last day of this one
+    const lastDay = new Date(year, month + 1, 0).getDate(); // day 0 of next month = last day of this one
     const end = `${year}-${pad(month + 1)}-${pad(lastDay)}`;
 
     const response = await fetch(
@@ -191,21 +193,20 @@ function ExpenseList({ onAuthError }) {
       onAuthError();
       return;
     }
-    if(!response.ok) {
+    if (!response.ok) {
       console.error("Export Failed", response.status);
       return;
     }
 
     const blob = await response.blob();
     const url = URL.createObjectURL(blob);
-    const link =  document.createElement("a");
+    const link = document.createElement("a");
     link.href = url;
-    link.download= `expenses_${start}_${end}.csv`;
+    link.download = `expenses_${start}_${end}.csv`;
     document.body.appendChild(link);
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
-
   }
 
   return (
@@ -289,6 +290,14 @@ function ExpenseList({ onAuthError }) {
                     value={editSpentOn}
                     onChange={(event) => setEditSpentOn(event.target.value)}
                   />
+                  <input
+                    className="rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    type="text"
+                    placeholder="Category (optional)"
+                    value={editCategory}
+                    onChange={(event) => setEditCategory(event.target.value)}
+                  />
+
                   <div className="flex justify-end gap-2"></div>
                   <button
                     type="button"
@@ -324,9 +333,9 @@ function ExpenseList({ onAuthError }) {
                             {expense.category}
                           </span>
                         ) : (
-                        <span className="mt-1 self-start rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-slate-600">
-                          Uncategorized
-                        </span>
+                          <span className="mt-1 self-start rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                            Uncategorized
+                          </span>
                         )}
                       </span>
 

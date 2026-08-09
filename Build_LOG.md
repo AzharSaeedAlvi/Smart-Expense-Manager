@@ -175,3 +175,4 @@
 - Add-expense from gained optional category override (blank-backend auto-categorizes) and now pre-fills today's local date.
 - Production hygiene is to never mix a pure refactor with a behavior change in the same commit.
 - Extracted categorization into categorization.py behind a Categorizer Protocol with a RulesCategorizer implmentation; main.py now uses default_categorizer(behavior-neutral).
+- Widened Food keywords (lunch, dinner, breakfast, meal, grocery etc.) so common meal descriptions auto-categorize.

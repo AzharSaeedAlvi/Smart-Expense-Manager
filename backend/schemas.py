@@ -33,6 +33,7 @@ class ExpenseUpdate(BaseModel):
         amount: Decimal | None = Field(default=None, gt=0, max_digits=10)          #NONE makes it optional
         description: str | None = Field(default=None, min_length=1, max_length=255)
         spent_on: date | None = None
+        category: str | None = Field(default = None, max_length=50)
 
 #Phase 5
 
