@@ -1,7 +1,8 @@
 from typing import Protocol 
 
 CATEGORY_RULES = {
-    "Food": ["swiggy", "zomato", "restaurant", "cafe", "coffee", "pizza"],
+    "Food": ["swiggy", "zomato", "restaurant", "cafe", "coffee", "pizza",
+             "lunch", "dinner", "breakfast", "meal", "food", "grocery", "groceries", "canteen"],
     "Transport": ["uber", "ola", "cab", "fuel", "petrol", "metro"],
     "Shopping": ["amazon", "flipkart", "myntra", "mall"],
     "Utilities": ["electricity", "water", "gas", "internet", "wifi", "recharge"],
