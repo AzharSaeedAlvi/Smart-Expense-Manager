@@ -104,6 +104,10 @@ def get_month_boundaries(
 
     return previous_start, current_start, next_start
 
+@app.get("/health")
+def health_check():
+    return{"status": "ok"}
+
 
 @app.post("/expenses", response_model=ExpenseRead, status_code=status.HTTP_201_CREATED)
 def create_expense(
