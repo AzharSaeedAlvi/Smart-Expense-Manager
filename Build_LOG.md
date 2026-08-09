@@ -178,4 +178,5 @@
 - Widened Food keywords (lunch, dinner, breakfast, meal, grocery etc.) so common meal descriptions auto-categorize.
 - Users can now edit or clear an expense's category from the inline edit form(blank -> null), making the "Uncategorized" flag actionable.
 - env values are exact.
-- 
+- Added get_categorizer() env-toggle factory (CATEGORIZER = rules|llm, defaults rules) and LLMCategorizer stub returning None - LLM seam wired and verified behavior-neutral, no real API call yet.
+- Quick mental model: the venv is a sealed box of Python packages for this one app. Activating it is "step inside the box." pip install adds a tool to whatever box you're currently inside. requirements.txt is the written inventory of that box, so a teammate (or Render, at deploy time) can rebuild the exact same box.
