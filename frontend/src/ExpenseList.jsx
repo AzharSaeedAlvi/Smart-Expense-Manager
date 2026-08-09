@@ -218,13 +218,13 @@ function ExpenseList({ onAuthError }) {
         <p className="mt-1 text-3xl font-bold text-blue-900">{monthlyTotal}</p>
       </div>
 
-      <button 
+      <button
         type="button"
         onClick={handleExportCsv}
         className="mb-6 rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
-        >
-          Export CSV
-        </button>
+      >
+        Export CSV
+      </button>
 
       {monthComparison && (
         <div className="mb-6 rounded-lg bg-slate-100 p-4">
@@ -315,8 +315,19 @@ function ExpenseList({ onAuthError }) {
                       Description
                     </label>
                     <div className="grid min-w-0 flex-1 grid-cols gap-1 text-sm text-gray-700 sm:grid-cols-[minmax(0,1fr)_6rem_7rem] sm:gap-4">
-                      <span className="truncate font-medium text-gray-900">
-                        {expense.description}
+                      <span className="flex min-w-0 flex-col">
+                        <span className="truncate font-medium text-gray-900">
+                          {expense.description}
+                        </span>
+                        {expense.category ? (
+                          <span className="mt-1 self-start rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                            {expense.category}
+                          </span>
+                        ) : (
+                        <span className="mt-1 self-start rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                          Uncategorized
+                        </span>
+                        )}
                       </span>
 
                       <span className="sm:text-right">
