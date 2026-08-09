@@ -6,7 +6,7 @@ load_dotenv()  #Load .env before we read any env vars
 
 from typing import Protocol 
 
-GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_MODEL = "gemini-flash-latest"
 
 
 CATEGORY_RULES = {
@@ -45,8 +45,13 @@ class LLMCategorizer:
         self._client = genai.Client(api_key=api_key)
         self._allowed = set(CATEGORY_RULES.keys())
         self._fallback = RulesCategorizer()
+        self._cache: dict[str, str | None] = {}
 
     def categorize(self, description: str) -> str | None:
+        key = description.strip().lower()
+        if key in self._cache:
+            return self._cache[key]
+        
         categories = ", ".join(sorted(self._allowed))
         prompt = (
             "You are an expense categorizer. "
@@ -61,12 +66,16 @@ class LLMCategorizer:
                 contents=prompt,
             )
             answer = (response.text or "").strip().strip(".").strip()
+            result = None
             for category in self._allowed:
                 if answer.lower() == category.lower():
-                    return category
-            return None
-        except Exception:
+                    result = category
+                    break
+            self._cache[key] = result    #cache only successful LLM outcomes
+            return result
+        except Exception as e:
             #Any API error/timeout -> degarde gracefully to the rules engine. 
+            print(f"[categorizer] LLM ERROR -> falling back to rules: {e!r}")
             return self._fallback.categorize(description)
 
 

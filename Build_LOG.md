@@ -180,3 +180,7 @@
 - env values are exact.
 - Added get_categorizer() env-toggle factory (CATEGORIZER = rules|llm, defaults rules) and LLMCategorizer stub returning None - LLM seam wired and verified behavior-neutral, no real API call yet.
 - Quick mental model: the venv is a sealed box of Python packages for this one app. Activating it is "step inside the box." pip install adds a tool to whatever box you're currently inside. requirements.txt is the written inventory of that box, so a teammate (or Render, at deploy time) can rebuild the exact same box.
+- LLM Categorizer calls Gemini with a category-constrained prompt, validates against the five categories, returns None on no-fit, and falls back to rules on any API error - real LLM categorization working behind the CATEGORIZER toggle.
+- Memoization : The technique of caching a function's result by its input.
+- The cache write goes on the success path only.
+- Added description-lvel memoization to LLMCategorizer (normalized key, caches only successful LLM results, never fallbacks) and switched the except to log the error instead of swallowing it. Verified cache hit with zero API calls (kFc -> cached 'kfc' -> Food). Model pinned to gemini-flash-latest after 2.5 models 404'd for new keys and 2.0-flash returned free-tier limit:0.
