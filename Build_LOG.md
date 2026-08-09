@@ -176,3 +176,6 @@
 - Production hygiene is to never mix a pure refactor with a behavior change in the same commit.
 - Extracted categorization into categorization.py behind a Categorizer Protocol with a RulesCategorizer implmentation; main.py now uses default_categorizer(behavior-neutral).
 - Widened Food keywords (lunch, dinner, breakfast, meal, grocery etc.) so common meal descriptions auto-categorize.
+- Users can now edit or clear an expense's category from the inline edit form(blank -> null), making the "Uncategorized" flag actionable.
+- env values are exact.
+- 

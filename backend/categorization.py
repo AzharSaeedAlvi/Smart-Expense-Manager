@@ -1,4 +1,10 @@
+import os
+from dotenv import load_dotenv
+
+load_dotenv()  #Load .env before we read any env vars
+
 from typing import Protocol 
+
 
 CATEGORY_RULES = {
     "Food": ["swiggy", "zomato", "restaurant", "cafe", "coffee", "pizza",
@@ -28,5 +34,22 @@ class RulesCategorizer:
                 return category
         return None
 
-# The single instance the rest of the app imports and uses.
-default_categorizer : Categorizer = RulesCategorizer()
+class LLMCategorizer:
+    """LLM-backed categorizer. STUB for now: returns None until the real call is wired in."""
+
+    def categorize(self, description: str) -> str | None:
+        # TODOO (next step): real LLM call here, with a rules fallback on error.
+        return None
+
+
+def get_catergorizer() -> Categorizer:
+    """Pick the categorizer based on the CATEGORIZER env var. Defaults to rules."""
+    kind = os.getenv("CATEGORIZER", "rules").strip().lower()
+    if kind == "llm":
+            return LLMCategorizer()
+    if kind == "rules":
+        return RulesCategorizer()
+    #Unknown values fall back to rules for safety; the "llm" branch comes next step. 
+    return RulesCategorizer()
+
+default_categorizer: Categorizer = get_catergorizer()
