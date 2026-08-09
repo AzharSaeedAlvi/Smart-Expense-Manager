@@ -171,3 +171,4 @@
 # Phase 7 
 
 - Added keyword-based categorize() and auto-fill on expense create, with user override respected; category now surfaced on ExpenseCreate(optional) and ExpenseRead.
+- Expense rows now show a category pill, with a distinct red "Unncategorized" fallback for rows the rules didn't match.

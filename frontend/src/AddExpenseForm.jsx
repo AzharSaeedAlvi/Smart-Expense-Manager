@@ -1,9 +1,20 @@
 import {useState} from 'react';
 
+// Helper for pre-filled todays date
+
+function getTodayString() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2,"0");
+  return `${year}-${month}-${day}`;
+}
+
 function AddExpenseForm({ onAdded, onAuthError }) {
     const [description, setDescription] = useState("");
     const [amount, setAmount] = useState("");
-    const [spentOn, setSpentOn] = useState("");
+    const [spentOn, setSpentOn] = useState(getTodayString());
+    const [category, setCategory] = useState("");
 
     async function handleAdd(event) {
         event.preventDefault();
@@ -15,7 +26,12 @@ function AddExpenseForm({ onAdded, onAuthError }) {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
     },
-            body: JSON.stringify({description, amount, spent_on: spentOn}),
+            body: JSON.stringify({
+              description,
+              amount,
+              spent_on: spentOn,
+              category: category.trim() || null,
+            }),
         });
 
         if (response.status === 401) {
@@ -26,7 +42,8 @@ function AddExpenseForm({ onAdded, onAuthError }) {
         if (response.ok) {
             setDescription("");
             setAmount("");
-            setSpentOn("");
+            setSpentOn(getTodayString());
+            setCategory("");
             onAdded(); // Notify parent component that a new expense has been added and refreshes ExpenseList
         } else {
             console.error("Add failed", response.status);
@@ -65,8 +82,16 @@ function AddExpenseForm({ onAdded, onAuthError }) {
           placeholder="Spent On"
           value={spentOn}
           onChange={(event) => setSpentOn(event.target.value)}
-          className="rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 "
+          className="rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+        <input 
+          id="category"
+          type="text"
+          placeholder="Category (optional)"
+          value={category}
+          onChange={(event) => setCategory(event.target.value)}
+          className="rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         <button
           type="submit"
           className="rounded-md bg-blue-600 py-2 font-medium text-white transition-colors hover:bg-blue-700"
