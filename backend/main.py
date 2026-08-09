@@ -14,6 +14,8 @@ from schemas import (
 ExpenseCreate, ExpenseRead, ExpenseUpdate, MonthlyTotalRead, MonthOverMonthRead
 )
 
+from categorization import default_categorizer
+
 from datetime import date
 
 from typing import List 
@@ -103,22 +105,6 @@ def get_month_boundaries(
     return previous_start, current_start, next_start
 
 
-CATEGORY_RULES = {
-    "Food": ["swiggy", "zomato", "restaurant", "cafe", "coffee", "pizza"],
-    "Transport": ["uber", "ola", "cab", "fuel", "petrol", "metro"],
-    "Shopping": ["amazon", "flipkart", "myntra", "mall"],
-    "Utilities": ["electricity", "water", "gas", "internet", "wifi", "recharge"],
-    "Entertainment": ["netflix", "spotify", "movie", "bookmyshow"],
-}
-
-def categorize(description: str) -> str | None:
-    text = description.lower()
-    for category, keywords in CATEGORY_RULES.items():
-        if any(keyword in text for keyword in keywords):
-            return category
-    return None
-
-
 @app.post("/expenses", response_model=ExpenseRead, status_code=status.HTTP_201_CREATED)
 def create_expense(
     payload: ExpenseCreate,
@@ -128,21 +114,12 @@ def create_expense(
 
     data = payload.model_dump()
     if data.get("category") is None:
-            data["category"] = categorize(data["description"])
+            data["category"] = default_categorizer.categorize(data["description"])
     expense = Expense(**data, user_id=current_user.id)
     db.add(expense)
     db.commit()
     db.refresh(expense)
     return expense
-
-
-## This was used when we did not have authorization setup. We used a pre-created DEV_USER to store exepnses
-# def create_expense(payload: ExpenseCreate, db: Session = Depends(get_db)):
-#     expense = Expense(**payload.model_dump(), user_id=DEV_USER_ID) # Assuming DEV_USER_ID is defined in seed_dev_user.py
-#     db.add(expense)          # Stages the row
-#     db.commit()              # Writes it to DB
-#     db.refresh(expense)      # Re-reads it so the DB generated files gets populated in your object. 
-#     return expense           # Converts : raw SQLAlchemy object, response_model and from_attributes=True into clean JSON.
 
 
 @app.get("/expenses", response_model=List[ExpenseRead])
