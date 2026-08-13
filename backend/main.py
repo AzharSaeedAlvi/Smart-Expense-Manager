@@ -1,8 +1,14 @@
 import csv
 import io
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
 
 from fastapi.middleware.cors import CORSMiddleware
+
+import logging
+import uuid
+from fastapi import Request
+
+logger = logging.getLogger("expense-api")
 
 from fastapi import FastAPI, Depends, status, HTTPException
 from sqlalchemy.orm import Session
@@ -48,6 +54,25 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    error_id = uuid.uuid4().hex[:8]
+    logger.exception(
+        "Unhandled error [%s] on %s %s", error_id, request.method, request.url.path
+      )
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error", "error_id": error_id},
+     
+    )
+
+@app.get("/debug/boom")
+def debug_boom():
+    raise RuntimeError("intentional test explosion")
+
+    
    # Phase 3 Dependency : This needs to be at the top, as this will help us in authorizing the valuse
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl = "auth/login")
