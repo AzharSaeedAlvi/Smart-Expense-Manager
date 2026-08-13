@@ -68,9 +68,6 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
      
     )
 
-@app.get("/debug/boom")
-def debug_boom():
-    raise RuntimeError("intentional test explosion")
 
     
    # Phase 3 Dependency : This needs to be at the top, as this will help us in authorizing the valuse
