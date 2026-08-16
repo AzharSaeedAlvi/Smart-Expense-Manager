@@ -191,4 +191,11 @@
 
 - Added unauthenticated GET /health returning {"status: "ok"}. Liveness probe for monitoring/Render; no auth, no DB hit by design.
 - Cleanup: corrected stale LLMCategorizer docstring (was "STUB"); renamed get_catergorizer -> get_categorizer at both sites. No behavior change.
+- Security Audit: probed input validation (422), auth(401), auth(401), not-found (404), and cross-user isolation (200 owner/404 other). No leaks found.
+- Added global Exception handler: server-side traceback + correlation error_id, generic 500 body to client. Confirmed it does not hijack HTTPException (404 stayed 404). Verified with throway /debug/boom probe, then removed it.
+- Added pytest suite (test_smoke.py): health 200, auth 4011, negative-amount 422. Introduced as_authenticated_user fixture (dependency_overrides + teardown) to test auth'd paths without a live login. Froze pytest/httpx into requirements.
+- Added test_cross_user_isolation with an in-memory StaticPool test DB (get_db + get_current_user overrides). Same expense id: 200 for owner, 404 for other user. Isolation gurantee now permanent in the suite. 4 tests passing.
+- Secrets/git-history audit: .env not tracked (git ls-files), never commited by path (git log -- backend/.env), and no secret VALUES in history (git log -S on SECRET_KEY + GEMINI_API_KEY values, all branches). Clean. alembic/env.py was a benign name-match false positive.
+- Added limit/offset pagination + deterministic ordering to GET /expenses. limit default 50, le=100 (422 ove cap). Behavior change: list now returns max 50 by default (was all rows) - frontend may later need a "load more". No chema change.
+
 

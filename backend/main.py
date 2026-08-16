@@ -2,6 +2,7 @@ import csv
 import io
 from fastapi.responses import StreamingResponse, JSONResponse
 
+
 from fastapi.middleware.cors import CORSMiddleware
 
 import logging
@@ -10,7 +11,7 @@ from fastapi import Request
 
 logger = logging.getLogger("expense-api")
 
-from fastapi import FastAPI, Depends, status, HTTPException
+from fastapi import FastAPI, Depends, status, HTTPException, Query
 from sqlalchemy.orm import Session
 
 
@@ -148,15 +149,24 @@ def create_expense(
     return expense
 
 
+
+
 @app.get("/expenses", response_model=List[ExpenseRead])
 def list_expenses(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
+    limit: int = Query(default=50, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
 ):
     expenses = db.scalars(
-        select(Expense).where(Expense.user_id == current_user.id)
+        select(Expense)
+        .where(Expense.user_id == current_user.id)
+        .order_by(Expense.spent_on.desc(), Expense.id.desc())
+        .limit(limit)
+        .offset(offset)
     ).all()
     return expenses
+
 
 #The above can be read as: Hi, look into the database, get the Expense object and then compare the Expense.user_id object with current_user.id and if it matches return all the expenses, if you would only like 1 expense run .first() instead of .all()
 
