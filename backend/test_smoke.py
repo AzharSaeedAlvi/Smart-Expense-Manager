@@ -72,6 +72,30 @@ def test_cross_user_isolation(test_db):
     assert other.status_code == 404
 
 
+def test_list_expenses_respects_limit(test_db):
+    user = User(name="Pager", email="pager@test.com", hashed_password="x")
+    test_db.add(user)
+    test_db.commit()
+    uid = user.id
+
+    for i in range(5):
+        test_db.add(Expense(
+            amount=10 + i,
+            description=f"expense {i}",
+            spent_on=date(2026, 8, 13),
+            user_id=uid,
+        ))
+    test_db.commit()
+
+    app.dependency_overrides[get_current_user] = lambda: User(id=uid)
+
+    capped = client.get("/expenses?limit=2")
+    assert capped.status_code == 200
+    assert len(capped.json()) == 2
+
+    over_cap = client.get("/expenses?limit=999")
+    assert over_cap.status_code == 422
+
 
 @pytest.fixture
 def as_authenticated_user():

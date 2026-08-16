@@ -197,5 +197,6 @@
 - Added test_cross_user_isolation with an in-memory StaticPool test DB (get_db + get_current_user overrides). Same expense id: 200 for owner, 404 for other user. Isolation gurantee now permanent in the suite. 4 tests passing.
 - Secrets/git-history audit: .env not tracked (git ls-files), never commited by path (git log -- backend/.env), and no secret VALUES in history (git log -S on SECRET_KEY + GEMINI_API_KEY values, all branches). Clean. alembic/env.py was a benign name-match false positive.
 - Added limit/offset pagination + deterministic ordering to GET /expenses. limit default 50, le=100 (422 ove cap). Behavior change: list now returns max 50 by default (was all rows) - frontend may later need a "load more". No chema change.
+- Added test_list_expenses_respects_limit (Seeds 5 rows in test DB): limit=2 -> 2 rows/200, limit=999 -> 422. 5 tests passing. Pagination hardening now permanent.
 
 
